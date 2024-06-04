@@ -199,10 +199,12 @@ public class TranscribeStreamingClientWrapper {
      */
     private StartStreamTranscriptionRequest getRequest(Integer mediaSampleRateHertz) {
         return StartStreamTranscriptionRequest.builder()
-                .languageCode(LanguageCode.EN_US.toString())
+                .identifyMultipleLanguages(Boolean.TRUE)
+                .showSpeakerLabel(Boolean.TRUE)
+                .languageOptions("en-US,hi-IN")
+                .preferredLanguage("en-US")
                 .mediaEncoding(MediaEncoding.PCM)
                 .mediaSampleRateHertz(mediaSampleRateHertz)
-                .showSpeakerLabel(true)
                 .build();
     }
 
