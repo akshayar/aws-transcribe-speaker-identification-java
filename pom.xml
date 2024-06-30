@@ -44,6 +44,10 @@
   <dependencies>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
+      <artifactId>transcribe</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
       <artifactId>transcribestreaming</artifactId>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams -->
