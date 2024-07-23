@@ -1,7 +1,5 @@
 package com.sample.transcribestreamin.multichannel;
 
-import com.sample.transcribestreamin.multichannel.InterleaveStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
