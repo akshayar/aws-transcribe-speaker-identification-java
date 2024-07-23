@@ -15,12 +15,16 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.transcribestreaming.TranscribeStreamingAsyncClient;
+import software.amazon.awssdk.services.transcribestreaming.model.LanguageCode;
+import software.amazon.awssdk.services.transcribestreaming.model.MediaEncoding;
+import software.amazon.awssdk.services.transcribestreaming.model.StartStreamTranscriptionRequest;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
