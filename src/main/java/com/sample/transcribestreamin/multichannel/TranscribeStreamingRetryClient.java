@@ -15,54 +15,44 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.amazonaws.transcribestreaming;
+package com.sample.transcribestreamin.multichannel;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.transcribestreaming.TranscribeStreamingAsyncClient;
+import software.amazon.awssdk.services.transcribestreaming.model.AudioStream;
+import software.amazon.awssdk.services.transcribestreaming.model.BadRequestException;
+import software.amazon.awssdk.services.transcribestreaming.model.StartStreamTranscriptionRequest;
+import software.amazon.awssdk.services.transcribestreaming.model.StartStreamTranscriptionResponseHandler;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.reactivestreams.Publisher;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.signer.EventStreamAws4Signer;
-import software.amazon.awssdk.core.client.config.SdkAdvancedClientOption;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.transcribestreaming.TranscribeStreamingAsyncClient;
-import software.amazon.awssdk.services.transcribestreaming.model.*;
 
 
 /**
  * This class wraps the AWS SDK implementation of the AWS Transcribe API with some retry logic to handle common
  * error cases, such as flaky network connections.
  */
+@Component
 public class TranscribeStreamingRetryClient {
 
     private static final int DEFAULT_MAX_RETRIES = 10;
     private static final int DEFAULT_MAX_SLEEP_TIME_MILLS = 100;
+    @Value("${maxRetries:10}")
     private int maxRetries = DEFAULT_MAX_RETRIES;
+    @Value("${sleepTime:100}")
     private int sleepTime = DEFAULT_MAX_SLEEP_TIME_MILLS;
-    private final TranscribeStreamingAsyncClient client;
+
+    @Autowired
+    private TranscribeStreamingAsyncClient client;
     List<Class<?>> nonRetriableExceptions = Arrays.asList(BadRequestException.class);
 
-    /**
-     * Create a TranscribeStreamingRetryClient with given credential and configuration
-     * @param creds Creds to used for transcription
-     * @param endpoint Endpoint to use for transcription
-     * @param region Region to use for transcriptions
-     * @throws URISyntaxException if the endpoint is not a URI
-     */
-    public TranscribeStreamingRetryClient(AwsCredentialsProvider creds,
-                                          String endpoint, Region region) throws URISyntaxException {
-        this(TranscribeStreamingAsyncClient.builder()
-                     .overrideConfiguration(
-                             c -> c.putAdvancedOption(
-                                     SdkAdvancedClientOption.SIGNER,
-                                     EventStreamAws4Signer.create()))
-                     .credentialsProvider(creds)
-                     .endpointOverride(new URI(endpoint))
-                     .region(region)
-                     .build());
+    public TranscribeStreamingRetryClient(){
+
     }
 
     /**

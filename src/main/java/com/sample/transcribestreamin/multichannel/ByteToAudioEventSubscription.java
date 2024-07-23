@@ -15,7 +15,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.amazonaws.transcribestreaming;
+package com.sample.transcribestreamin.multichannel;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -24,11 +24,9 @@ import software.amazon.awssdk.services.transcribestreaming.model.AudioEvent;
 import software.amazon.awssdk.services.transcribestreaming.model.AudioStream;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -40,16 +38,18 @@ import java.util.concurrent.atomic.AtomicLong;
  * https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.2/README.md
  */
 public class ByteToAudioEventSubscription implements Subscription {
-    private static final int CHUNK_SIZE_IN_BYTES = 1024 * 4;
-    private ExecutorService executor = Executors.newFixedThreadPool(1);
-    private AtomicLong demand = new AtomicLong(0);
-
+    private final int chunkSizeInBytes;
+    private final ExecutorService executor ;
     private final Subscriber<? super AudioStream> subscriber;
-    private final InputStream inputStream;
+    private final AtomicLong demand = new AtomicLong(0);
+    private final StreamReader streamReader;
 
-    public ByteToAudioEventSubscription(Subscriber<? super AudioStream> s, InputStream inputStream) {
+
+    public ByteToAudioEventSubscription(Subscriber<? super AudioStream> s, ExecutorService executor, int chunkSizeInBytes, StreamReader streamReader) {
         this.subscriber = s;
-        this.inputStream = inputStream;
+        this.executor=executor;
+        this.chunkSizeInBytes=chunkSizeInBytes;
+        this.streamReader=streamReader;
     }
 
     @Override
@@ -73,6 +73,7 @@ public class ByteToAudioEventSubscription implements Subscription {
                     }
                 } while (demand.decrementAndGet() > 0);
             } catch (Exception e) {
+                e.printStackTrace();
                 subscriber.onError(e);
             }
         });
@@ -85,10 +86,10 @@ public class ByteToAudioEventSubscription implements Subscription {
 
     private ByteBuffer getNextEvent() {
         ByteBuffer audioBuffer = null;
-        byte[] audioBytes = new byte[CHUNK_SIZE_IN_BYTES];
+        byte[] audioBytes = new byte[chunkSizeInBytes];
 
         try {
-            int len = inputStream.read(audioBytes);
+            int len = streamReader.read(audioBytes);
 
             if (len <= 0) {
                 audioBuffer = ByteBuffer.allocate(0);
@@ -107,4 +108,9 @@ public class ByteToAudioEventSubscription implements Subscription {
                 .audioChunk(SdkBytes.fromByteBuffer(bb))
                 .build();
     }
+
+    public static interface StreamReader {
+        int read(byte[] b) throws IOException;
+    }
+
 }
