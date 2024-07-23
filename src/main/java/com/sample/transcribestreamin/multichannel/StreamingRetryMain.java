@@ -50,8 +50,8 @@ public class StreamingRetryMain implements CommandLineRunner, ApplicationContext
     @Override
     public void run(String... args) throws Exception {
         LOG.info("EXECUTING : command line runner");
-        final String FILE2 =  "/Users/rawaaksh/Music/Music/Media.localized/Unknown Artist/Unknown Album/speech_six.wav";
-        final String FILE1 = "/Users/rawaaksh/Music/Music/Media.localized/Unknown Artist/Unknown Album/speech_four.wav";
+        final String FILE2 =  "src/test/resources/speech_ai.wav";
+        final String FILE1 = "src/test/resources/speech_nature.wav";
 
         InputStream streamOne=TranscribeHelper.getStreamFromFile(FILE1);
         InputStream streamTwo=TranscribeHelper.getStreamFromFile(FILE2);
@@ -74,7 +74,7 @@ public class StreamingRetryMain implements CommandLineRunner, ApplicationContext
 
     @Bean
     public ExecutorService getExecutorService(){
-        return Executors.newCachedThreadPool();
+        return Executors.newSingleThreadExecutor();
     }
 
 
