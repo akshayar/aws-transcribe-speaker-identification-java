@@ -15,45 +15,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.sample.transcribestreamin.multichannel;
+package com.amazonaws.transcribestreaming;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.transcribestreaming.model.AudioStream;
 
-import java.util.concurrent.ExecutorService;
+import java.io.InputStream;
 
 /**
  * AudioStreamPublisher implements audio stream publisher.
  * AudioStreamPublisher emits audio stream asynchronously in a separate thread
  */
-@Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class AudioStreamPublisher implements Publisher<AudioStream> {
-    @Value("${chunkSizeInBytes:1024}")
-    private int chunkSizeInBytes = 1024;
-    @Autowired
-    private ExecutorService executor ;
-    private ByteToAudioEventSubscription.StreamReader streamReader;
 
-    public AudioStreamPublisher(){}
-    public AudioStreamPublisher(ByteToAudioEventSubscription.StreamReader reader) {
-        this.streamReader=reader;
+    private final InputStream inputStream;
+
+    public AudioStreamPublisher(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     @Override
     public void subscribe(Subscriber<? super AudioStream> s) {
-        Subscription subscription=new ByteToAudioEventSubscription(s,executor,chunkSizeInBytes, streamReader);
-        s.onSubscribe(subscription);
-    }
-
-    public void setStreamReader(ByteToAudioEventSubscription.StreamReader streamReader) {
-        this.streamReader = streamReader;
+        s.onSubscribe(new ByteToAudioEventSubscription(s, inputStream));
     }
 }
