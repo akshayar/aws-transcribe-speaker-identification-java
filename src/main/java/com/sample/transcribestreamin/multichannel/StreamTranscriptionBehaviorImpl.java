@@ -21,7 +21,8 @@ public class StreamTranscriptionBehaviorImpl implements StreamTranscriptionBehav
 
     @Override
     public void onStream(TranscriptResultStream e){
-        onStreamWithChannel(e);
+        onStream(e);
+        //onStreamWithChannel(e);
     }
     private void onStreamWithChannel(TranscriptResultStream e){
         List<Result> results = ((TranscriptEvent) e).transcript().results();
